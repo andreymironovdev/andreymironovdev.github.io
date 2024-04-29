@@ -119,9 +119,11 @@
           refElement.position().top <= scrollPos &&
           refElement.position().top + refElement.height() > scrollPos
         ) {
+          console.log('add ' + this.toString())
           $(".nav ul li a").removeClass("active");
           currLink.addClass("active");
         } else {
+          console.log('remove ' + this.toString())
           currLink.removeClass("active");
         }
       } catch (e) {
