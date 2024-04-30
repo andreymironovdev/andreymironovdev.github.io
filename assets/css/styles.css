@@ -923,6 +923,7 @@ services
     -o-transition: all 0.3s ease 0s;
     transition: all 0.3s ease 0s;
     position: relative;
+    cursor: grab;
 }
 
 @media screen and (max-width: 920px) {
@@ -964,6 +965,7 @@ services
 }
 
 .service-item .service-title {
+    font-family: "Jost", sans-serif;
     font-weight: 500;
     font-size: 18px;
     color: #1e1e1e;
@@ -971,6 +973,7 @@ services
     margin-bottom: 15px;
     position: relative;
     z-index: 2;
+    height: 42px;
 }
 
 .service-item p {
