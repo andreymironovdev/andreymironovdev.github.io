@@ -1,0 +1,88 @@
+#services {
+    position: relative;
+    padding: 120px 0px 90px 0px;
+    background: #002444;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088e8', endColorstr='#0088e8', GradientType=1);
+}
+
+.service-item {
+    cursor: pointer;
+    display: block;
+    background: #ffffff;
+    box-shadow: 0 2px 48px 0 rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    -webkit-transition: all 0.3s ease 0s;
+    -moz-transition: all 0.3s ease 0s;
+    -o-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+    position: relative;
+    cursor: grab;
+}
+
+@media screen and (max-width: 920px) {
+    .service-item {
+        margin: 0px 30px !important;
+    }
+}
+
+.service-item:hover .icon,
+.service-item:hover a.main-button {
+    background-color: #002444;
+}
+
+.service-item .icon {
+    text-align: center;
+    -webkit-transition: all 0.3s ease 0s;
+    -moz-transition: all 0.3s ease 0s;
+    -o-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    margin: auto;
+    position: relative;
+    margin-bottom: 30px;
+    background: #002444;
+    color: #ffffff;
+    font-weight: bold;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    position: relative;
+}
+
+.service-item .icon img {
+    max-width: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.service-item .service-title {
+    font-family: "Jost", sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: #1e1e1e;
+    letter-spacing: 0.7px;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 2;
+    height: 42px;
+}
+
+.service-item p {
+    font-weight: 400;
+    font-size: 13px;
+    color: #777;
+    letter-spacing: 0.5px;
+    line-height: 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.service-item a.main-button {
+    margin-top: 30px;
+    display: inline-block;
+}
