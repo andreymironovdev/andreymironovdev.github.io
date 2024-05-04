@@ -1,0 +1,16 @@
+section {
+    position: relative;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    top: 80px;
+    h2 {
+        margin-bottom: 10px;
+    }
+    pre {
+        white-space: pre-wrap;
+    }
+}
+
+section.last-section {
+    margin-bottom: 80px;
+}

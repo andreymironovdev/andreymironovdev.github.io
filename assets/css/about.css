@@ -25,10 +25,13 @@
     letter-spacing: 0.5px;
 }
 
-#about li:before {
-    content: "\f00c";
-    font-family: FontAwesome;
-    display: inline-block;
-    color: dodgerblue;
-    margin-right: 10px;
+#about li {
+    list-style: none;
+    &:before {
+        content: "\f00c";
+        font-family: FontAwesome;
+        display: inline-block;
+        color: dodgerblue;
+        margin-right: 10px;
+    }
 }

@@ -106,11 +106,12 @@ html[xmlns] .clearfix {
     height: 1%;
 }
 
-ul,
-li {
-    padding: 0;
-    margin: 0;
-    list-style: none;
+header {
+    ul, li {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
 }
 
 header,
@@ -156,7 +157,7 @@ ul {
     margin-bottom: 0px;
 }
 
-p {
+p, li {
     font-size: 15px;
     line-height: 25px;
     color: #4a4a4a;
@@ -258,18 +259,4 @@ button.main-button {
 
 button.main-button:hover {
     background-color: #0088e8;
-}
-
-.section-heading h2 {
-    text-align: center;
-    font-size: 48px;
-    font-weight: 300;
-    color: #232323;
-    margin-bottom: 20px;
-}
-
-.section-heading p {
-    font-size: 17px;
-    color: #777;
-    text-align: center;
 }

@@ -18,8 +18,8 @@
     <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.css">
     <link rel="stylesheet" type="text/css" href="assets/css/owl-carousel.css">
     <link rel="stylesheet" type="text/css" href="assets/css/common.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/header-article.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/article.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/article/header.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/article/section.css">
     <link rel="stylesheet" type="text/css" href="assets/css/footer.css">
     <link rel="stylesheet" type="text/css" href="assets/css/highlight-default.css">
 </head>
@@ -49,28 +49,183 @@
         </div>
     </div>
 </header>
-<div class="home-area" id="article">
-    <div class="header-text">
-        <div class="container">
-            <div class="row">
-                <div class="text-center col-12"
-                     data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
-                    <h1>Tree structure and concurrent inserts</h1>
-                </div>
+<section id="header">
+    <div class="container">
+        <div class="row">
+            <div class="text-center col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h1>Tree structure and concurrent inserts</h1>
             </div>
         </div>
     </div>
+</section>
+<section id="introduction">
     <div class="container">
         <div class="row">
             <div class="text-left col-12"
                  data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
                 <h2>Introduction</h2>
-                <p>Suppose we have a table in our web application which expresses a tree structure, for example folders and files:</p>
-                <pre><code class="language-sql">create type tree_item_type as enum (''folder'',''file''); create table tree_item (id bigserial not null primary key, name text not null, item_type tree_item_type not null, parent_id bigint references tree_item(id));</code></pre>
+                <p>Suppose we have a table in our web application which expresses a tree structure, for example folders
+                    and files:</p>
+                <pre>
+                    <code class="language-sql">create type tree_item_type as enum ('folder','file');
+create table tree_item (
+    id bigserial not null primary key,
+    name text not null,
+    item_type tree_item_type not null,
+    parent_id bigint references tree_item(id)
+);</code>
+                </pre>
+                <p>Of course, we don''t want any folder to contain two items with the same name and type. So we have to
+                    add a unique index:</p>
+                <pre>
+                    <code class="language-sql">create unique index tree_item_name_uidx on tree_item (name, item_type, parent_id);</code>
+                </pre>
+                <p>Please note that this index allows duplicate item names on the root level:</p>
+                <pre>
+                    <code class="language-sql">insert into tree_item (name, item_type, parent_id)
+values
+    ('item 1','folder', null),
+    ('item 1','folder',null); --no error</code>
+                </pre>
+                <p>To overcome this issue we can create two partial indexes instead:</p>
+                <pre>
+                    <code class="language-sql">create unique index tree_item_name_uidx on tree_item (name, item_type, parent_id)
+where parent_id is not null;
+create unique index tree_item_name_root_uidx on tree_item (name, item_type)
+where parent_id is null;</code>
+                </pre>
+                <p>... or use <a target="_blank" style="text-decoration: underline"
+                                 href="https://www.postgresql.org/about/featurematrix/detail/392">the new feature</a>
+                    from PostgreSQL 15:</p>
+                <pre>
+                    <code class="language-sql">create unique index tree_item_name_uidx on tree_item (name, item_type, parent_id) nulls not distinct;</code>
+                </pre>
+                <p>Ok, that's good, and the last thing we need to prepare is an insert query. Let's make it in a
+                    traditional way for all operating systems - user doesn't choose the name of the new folder, we
+                    calculate it based on existing ones:</p>
+                <pre>
+                    <code class="language-sql">with max_name_index as (
+    select coalesce(max(replace(name, 'new folder ', '')::int), 0) as i
+    from tree_item where name ~ 'new folder \\d' and parent_id = 777
+)
+insert into tree_item (name, item_type, parent_id)
+select 'new folder ' || i + 1, 'folder', 777
+from max_name_index
+returning *;</code>
+                </pre>
+                <p>So if the folder with <code>id=777</code> already contains items "new folder 1", "new folder 2",
+                    then the inserted folder will have the name "new folder 3".</p>
             </div>
         </div>
     </div>
-</div>
+</section>
+<section id="problem">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h2>Problem</h2>
+                <p>Ok, so what's the main issue? If our application has an option for creating folders and files from
+                    UI, then users may encounter problems on concurrent inserts. Assume that user navigated to the
+                    folder with <code>id = 777</code> and pressed the button "Create new folder", so the first
+                    transaction started:</p>
+                <pre>
+                    <code class="language-sql">start transaction;--perform insert query with parent_id=777"</code>
+                </pre>
+                <p>... while another user pressed the same button for the same parent folder and triggered the second
+                    transaction:</p>
+                <pre>
+                    <code class="language-sql">start transaction;--perform another insert query with parent_id=777</code>
+                </pre>
+                <p>Then the first transaction commits:</p>
+                <pre>
+                    <code class="language-sql">commit;</code>
+                </pre>
+                <p>... and we see an error in the second transaction: <code>[23505] ERROR: duplicate key value violates
+                    unique constraint "tree_item_name_uidx"</code>.</p>
+                <div>
+                    <p>How can we work around it? We can think about 2 ways:</p>
+                    <ul style="list-style: inside decimal">
+                        <li>Tuning transaction isolation level;</li>
+                        <li>Adding <code>on conflict do ...</code> to the end of the insert query;</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="isolation level">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h2>Changing isolation level</h2>
+                <p>In short words, it won't help 🥲. In order to calculate the right name of the new folder the second
+                    transaction needs to see the row, which was inserted in the first one.
+                    PostgreSQL doesn't support "Read uncommitted" isolation level, so calculation can be suceeded only
+                    if the first transaction was committed.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="on conflict">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h2>On conflict do nothing</h2>
+                <p>Better choice is to add <code>on conflict do nothing</code> to the end of the query, but the abscence
+                    of the new folder as a result of the second transaction won''t be a feature, it will be a bug.
+                    So in this case we need to implement a "retry" pattern and rerun a query until it returns the new
+                    row or retry limit is achieved. And it is a good decision but not the best.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="guaranteed">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h2>Concurrent inserts with guaranteed result</h2>
+                <p>In the first case we understood that the second transaction needs to wait for the first one to commit
+                    in order to correctly calculate the name. And we can achieve it by locking the row, which is common
+                    for both transactions - it is the row of parent folder. So here is the complete query:</p>
+                <pre>
+                    <code class="language-sql">start transaction;
+select * from tree_item where id=777 for update;
+insert into tree_item (name, item_type, parent_id)
+select 'new folder ' || i + 1, 'folder', 777
+from (
+    select coalesce(max(cast(replace(name, 'new folder ', '' ) as int)), 0) as i
+    from tree_item
+    where name ~ 'new folder \\d' and parent_id = 777
+) max_name_index
+returning *;
+commit;</code>
+                </pre>
+                <p>We lock the parent folder before performing insert query, so the second transaction will wait for
+                    the first one to be committed and the row to be unlocked. And then the second insert query will be
+                    performed successfully.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="conclusion" class="last-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"
+                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                <h2>Conclusion</h2>
+                <p>We learned how to create a tree structure in PostgreSQL and how to handle concurrent inserts.
+                    We considered 2 ways - retry pattern and insertion with locking. The last one is the only way of
+                    guaranteed insertion.</p>
+            </div>
+        </div>
+    </div>
+</section>
 <footer id="footer">
     <div class="container">
         <div class="row">
