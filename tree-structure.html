@@ -53,7 +53,8 @@
     <div class="container">
         <div class="row">
             <div class="text-center col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                 data-scroll-reveal="enter top move 30px over 0.6s after 0.4s"
+            >
                 <h1>Tree structure and concurrent inserts</h1>
             </div>
         </div>
@@ -62,8 +63,9 @@
 <section id="introduction">
     <div class="container">
         <div class="row">
-            <div class="text-left col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            <div class="col-12"
+            data-scroll-reveal="enter left move 30px viewportFactor .05 over 0.6s after 0.4s"
+            >
                 <h2>Introduction</h2>
                 <p>Suppose we have a table in our web application which expresses a tree structure, for example folders
                     and files:</p>
@@ -124,7 +126,8 @@ returning *;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            data-scroll-reveal="enter left move 30px viewportFactor .05 over 0.6s after 0.4s"
+            >
                 <h2>Problem</h2>
                 <p>Ok, so what's the main issue? If our application has an option for creating folders and files from
                     UI, then users may encounter problems on concurrent inserts. Assume that user navigated to the
@@ -159,7 +162,8 @@ returning *;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            data-scroll-reveal="enter left move 30px over 0.6s after 0.4s"
+            >
                 <h2>Changing isolation level</h2>
                 <p>In short words, it won't help 🥲. In order to calculate the right name of the new folder the second
                     transaction needs to see the row, which was inserted in the first one.
@@ -173,7 +177,8 @@ returning *;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            data-scroll-reveal="enter left move 30px over 0.6s after 0.4s"
+            >
                 <h2>On conflict do nothing</h2>
                 <p>Better choice is to add <code>on conflict do nothing</code> to the end of the query, but the abscence
                     of the new folder as a result of the second transaction won''t be a feature, it will be a bug.
@@ -187,7 +192,8 @@ returning *;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            data-scroll-reveal="enter left move 30px over 0.6s after 0.4s"
+            >
                 <h2>Concurrent inserts with guaranteed result</h2>
                 <p>In the first case we understood that the second transaction needs to wait for the first one to commit
                     in order to correctly calculate the name. And we can achieve it by locking the row, which is common
@@ -217,7 +223,8 @@ commit;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+            data-scroll-reveal="enter left move 30px over 0.6s after 0.4s"
+            >
                 <h2>Conclusion</h2>
                 <p>We learned how to create a tree structure in PostgreSQL and how to handle concurrent inserts.
                     We considered 2 ways - retry pattern and insertion with locking. The last one is the only way of

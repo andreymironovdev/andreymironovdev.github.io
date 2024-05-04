@@ -53,7 +53,8 @@
     <div class="container">
         <div class="row">
             <div class="text-center col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                 data-scroll-reveal="enter top move 30px over 0.6s after 0.4s"
+            >
                 <h1>Transaction isolation levels overview</h1>
             </div>
         </div>
@@ -90,7 +91,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                 data-scroll-reveal="enter left move viewportFactor .05 30px over 0.6s after 0.4s">
                 <h2>Dirty read</h2>
                 <p>Assume that we have a table in our database:</p>
                 <pre>
@@ -124,7 +125,7 @@ select * from book;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                 data-scroll-reveal="enter left move 30px viewportFactor .05 over 0.6s after 0.4s">
                 <h2>Nonrepeatable read && Phantom read</h2>
                 <p>Let's move forward and consider the second phenomena - nonrepeatable read.
                     Let's fill books table with some rows:</p>
@@ -206,7 +207,7 @@ commit;</code>
     <div class="container">
         <div class="row">
             <div class="col-12"
-                 data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                 data-scroll-reveal="enter left move 30px viewportFactor .05 over 0.6s after 0.4s">
                 <h2>Serialization anomalies</h2>
                 <p>When two concurrent transactions modify the same data based on the current state of row, we
                     may encounter several anomalies, because the current state can be not actual. Let's see that
